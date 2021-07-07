@@ -1,0 +1,44 @@
+---    
+
+    - name: Wait for system to become reachable
+      wait_for_connection:
+        timeout: 180
+
+    - name: Install SSL module
+      yum:
+        name: mod_ssl
+        state: latest
+
+    - openssl_privatekey:
+         path: /etc/pki/tls/private/example.key
+         size: 2048 
+
+    - openssl_csr:
+         path: /etc/pki/tls/example.csr
+         privatekey_path: /etc/pki/tls/private/example.key 
+
+    - openssl_certificate:
+         provider: selfsigned
+         path: /etc/pki/tls/certs/example.crt
+         privatekey_path: /etc/pki/tls/private/example.key
+         csr_path: /etc/pki/tls/example.csr
+
+
+    - name: replace line
+      lineinfile:
+         path: /etc/httpd/conf.d/ssl.conf
+         regexp: '^(.*)localhost.crt(.*)$'
+         line: 'SSLCertificateFile /etc/pki/tls/certs/example.crt'
+         backrefs: yes
+      notify:   
+         - restart apache
+
+    - name: replace line
+      lineinfile:
+         path: /etc/httpd/conf.d/ssl.conf
+         regexp: '^(.*)localhost.key(.*)$'
+         line: 'SSLCertificateKeyFile /etc/pki/tls/private/example.key'
+         backrefs: yes
+      notify:
+        - restart apache
+

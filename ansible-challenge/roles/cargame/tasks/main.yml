@@ -1,0 +1,10 @@
+- name: Copy file with owner and permissions
+  ansible.builtin.copy:
+    src: cargame.html
+    dest: /var/www/html/index.html
+    owner: apache
+    group: apache
+    mode: '0644'
+
+  notify:
+    - restart apache

@@ -1,0 +1,32 @@
+---
+
+- hosts: localhost
+  connection: local
+  gather_facts: False
+
+  vars:
+    key_name: aws
+    region: ap-southeast-1
+    image: ami-018c1c51c7a13e363 # https://cloud-images.ubuntu.com/locator/ec2/
+    id: "game-app"
+    sec_group: "{{ id }}-sec"
+
+  roles:
+    -  EC2
+     
+- hosts: _gameserver
+  become: true  
+
+  roles:
+    - webserver
+
+- hosts: _car_game
+  become: true
+  roles:
+    - cargame
+
+
+- hosts: _snake_game
+  become: true
+  roles:
+    - snakegame
